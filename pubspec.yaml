@@ -1,4 +1,4 @@
-name: calibration
+name: caldor
 description: Library for generating FieldKit calibration data.
 version: 1.0.0
 publish_to: none
