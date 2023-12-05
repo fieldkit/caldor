@@ -12,7 +12,7 @@ dependencies:
   fixnum: ^1.0.1
   fk_data_protocol:
     git:
-      url: https://github.com/fieldkit/data-protocol.git
+      url: https://gitlab.com/fieldkit/libraries/data-protocol.git
       path: dart
 
 dev_dependencies:
