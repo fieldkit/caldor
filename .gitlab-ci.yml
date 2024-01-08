@@ -1,0 +1,40 @@
+stages:
+  - test
+  - build
+
+variables:
+  DART_VERSION: "stable"
+
+before_script:
+  - apt-get update -y && apt-get install -y --no-install-recommends apt-utils
+  - apt-get install -y bash curl git
+  - curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o chrome.deb
+  - apt-get install -y ./chrome.deb
+  - rm ./chrome.deb
+  - curl -sSL https://dart.dev/install/archive | bash -s $DART_VERSION
+  - export PATH="$PATH:/usr/lib/dart/bin"
+  - dart --version
+
+test:
+  stage: test
+  script:
+    - dart pub get
+    - dart analyze
+    - dart test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+
+build:
+  stage: build
+  script:
+    - dart pub get
+    - dart compile exe bin/caldor.dart -o caldor
+  artifacts:
+    paths:
+      - caldor
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+   
+
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
