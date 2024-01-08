@@ -11,7 +11,8 @@ before_script:
   - curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o chrome.deb
   - apt-get install -y ./chrome.deb
   - rm ./chrome.deb
-  - curl -sSL https://dart.dev/install/archive | bash -s $DART_VERSION
+  # Use the official installation script from dart.dev
+  - curl -sSL https://raw.githubusercontent.com/dart-lang/sdk/main/tools/install.sh | bash -s $DART_VERSION
   - export PATH="$PATH:/usr/lib/dart/bin"
   - dart --version
 
