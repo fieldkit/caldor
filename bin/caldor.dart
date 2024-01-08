@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:caldor/src/calibration_base.dart';
 
 void main(List<String> arguments) {
@@ -35,6 +34,7 @@ void main(List<String> arguments) {
   // This might include saving the calibration data, sending it to a server, etc.
 
   // Example: Serialize calibration data to bytes and do something with it
+  // ignore: unused_local_variable
   var calibrationDataBytes = currentCalibration.toBytes();
   // ... (handle the bytes data as needed)
 

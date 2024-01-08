@@ -6,19 +6,28 @@ Caldor is an innovative in-situ calibration system designed for field instrument
 ## Features
 - **In-Field Calibration:** Enables calibration in remote locations without needing lab facilities.
 - **Educational Resources:** Provides comprehensive guidelines on calibration procedures.
-- **User-Friendly Interface:** Simplifies the calibration process with an intuitive app.
+- **User-Friendly Interface:** Simplifies the calibration process when paired with the intuitive app.
 - **Versatility:** Compatible with various sensors like temperature, pH, conductivity, etc.
 - **Data Integrity:** Ensures high-quality data with traceable calibration standards.
 
 ## Getting Started
-- **Prerequisites:** List of necessary hardware and software.
+- **Prerequisites:** 
+    - `Linux`
+    - `Chrome`
+    - `bash`
+    - `git`
+    - `curl`
+    - `Flutter`
+    - `Dart`
+
 - **Installation:** 
-    `dart pub get`
-- **Initial Configuration:** Steps to configure the system for first-time use.
+    - `sudo apt-get update -y && sudo apt-get install`
+    
+- **Initial Configuration:** `dart pub get` or `flutter pub get`
 
 ## Usage
 To run: `dart run`
-To test: `dart test`
+To test: `dart test` or `flutter test`
 
 ## Additional Information
 For more information on the Caldor package, including how to contribute, report issues, or get support, visit our [GitHub repository](https://github.com/fieldkit/caldor).

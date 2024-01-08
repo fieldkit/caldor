@@ -1,0 +1,57 @@
+stages:
+  - test
+  - build
+
+variables:
+  DART_VERSION: "stable"
+
+before_script:
+  - apt-get update -y && apt-get install -y wget git unzip xz-utils zip libglu1-mesa
+  - apt-get install -y bash curl git
+  - curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o chrome.deb
+  - apt-get install -y ./chrome.deb
+  - rm ./chrome.deb
+
+  - apt-get install apt-transport-https
+  - wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/dart.gpg
+  - echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | tee /etc/apt/sources.list.d/dart_stable.list
+
+  # Update apt repositories
+  - apt-get update
+
+  # Install Dart
+  - apt-get install dart
+
+  # Install Flutter SDK
+  - git clone https://github.com/flutter/flutter.git /usr/lib/flutter
+  - export PATH="$PATH:/usr/lib/flutter/bin"
+
+  # Run flutter doctor
+  - flutter doctor
+  
+  - export PATH="$PATH:/usr/lib/dart/bin"
+  - dart --version
+
+test:
+  stage: test
+  script:
+    - flutter pub get
+    - flutter analyze
+    - flutter test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+
+build:
+  stage: build
+  script:
+    - flutter pub get
+    - dart compile exe bin/caldor.dart -o caldor
+  artifacts:
+    paths:
+      - caldor
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+   
+
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
