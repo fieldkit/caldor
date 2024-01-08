@@ -6,7 +6,7 @@ variables:
   DART_VERSION: "stable"
 
 before_script:
-  - apt-get update -y && apt-get install -y --no-install-recommends apt-utils
+  - apt-get update -y && apt-get install -y wget git unzip xz-utils zip libglu1-mesa
   - apt-get install -y bash curl git
   - curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o chrome.deb
   - apt-get install -y ./chrome.deb
@@ -16,6 +16,13 @@ before_script:
   - wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/dart.gpg
   - echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | tee /etc/apt/sources.list.d/dart_stable.list
   
+  # Install Flutter SDK
+  - RUN git clone https://github.com/flutter/flutter.git /usr/lib/flutter
+  - ENV PATH "$PATH:/usr/lib/flutter/bin"
+
+  # Run flutter doctor
+  - RUN flutter doctor
+
   # Update apt repositories
   - apt-get update
 
