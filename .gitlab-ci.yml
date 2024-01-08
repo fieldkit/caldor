@@ -36,8 +36,8 @@ test:
   stage: test
   script:
     - flutter pub get
-    - dart analyze
-    - dart test
+    - flutter analyze
+    - flutter test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
