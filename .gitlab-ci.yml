@@ -28,7 +28,7 @@ before_script:
 test:
   stage: test
   script:
-    - dart pub get
+    - flutter pub get
     - dart analyze
     - dart test
   rules:
@@ -38,7 +38,7 @@ test:
 build:
   stage: build
   script:
-    - dart pub get
+    - flutter pub get
     - dart compile exe bin/caldor.dart -o caldor
   artifacts:
     paths:
