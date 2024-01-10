@@ -92,7 +92,8 @@ class UserStandard extends Standard {
 }
 
 List<double> exponentialCurve(List<CalibrationPoint> points) {
-  ParametrizedUnaryFunction<double> fn = ParametrizedUnaryFunction.list(DataType.float, 3, (params) {
+  ParametrizedUnaryFunction<double> fn =
+      ParametrizedUnaryFunction.list(DataType.float, 3, (params) {
     return (double t) {
       return params[0] + params[1] * exp(t * params[2]);
     };
@@ -139,20 +140,25 @@ class CalibrationTemplate {
 
   CalibrationTemplate({required this.curveType, required this.standards});
 
-  static CalibrationTemplate waterPh() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
+  static CalibrationTemplate waterPh() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
 
-  static CalibrationTemplate waterDissolvedOxygen() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
+  static CalibrationTemplate waterDissolvedOxygen() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate waterEc() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
+  static CalibrationTemplate waterEc() => CalibrationTemplate(
+      curveType: CurveType.exponential,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate waterTemp() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
+  static CalibrationTemplate waterTemp() => CalibrationTemplate(
+      curveType: CurveType.exponential,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate showCase() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [UnknownStandard(), FixedStandard(10)]);
+  static CalibrationTemplate showCase() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [UnknownStandard(), FixedStandard(10)]);
 
   static CalibrationTemplate? forModuleKey(String key) {
     switch (key) {
@@ -178,7 +184,8 @@ class CurrentCalibration {
   final CalibrationKind kind;
   final List<CalibrationPoint> _points = List.empty(growable: true);
 
-  CurrentCalibration({required this.curveType, this.kind = CalibrationKind.none});
+  CurrentCalibration(
+      {required this.curveType, this.kind = CalibrationKind.none});
 
   @override
   String toString() => _points.toString();
@@ -190,8 +197,10 @@ class CurrentCalibration {
   proto.ModuleConfiguration toDataProtocol() {
     final time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final cps = _points
-        .map((p) =>
-            proto.CalibrationPoint(references: [p.standard.value!], uncalibrated: [p.reading.uncalibrated], factory: [p.reading.value]))
+        .map((p) => proto.CalibrationPoint(
+            references: [p.standard.value!],
+            uncalibrated: [p.reading.uncalibrated],
+            factory: [p.reading.value]))
         .toList();
     final coefficients = calculateCoefficients();
     final calibration = proto.Calibration(
