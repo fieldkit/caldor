@@ -153,7 +153,7 @@ class CalibrationTemplate {
       standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
   static CalibrationTemplate waterTemp() => CalibrationTemplate(
-      curveType: CurveType.exponential,
+      curveType: CurveType.linear,
       standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
   static CalibrationTemplate showCase() => CalibrationTemplate(
@@ -213,7 +213,12 @@ class CurrentCalibration {
   }
 
   List<double> calculateCoefficients() {
-    return linearCurve(_points);
+    switch (curveType) {
+      case CurveType.linear:
+        return linearCurve(_points);
+      case CurveType.exponential:
+        return exponentialCurve(_points);
+    }
   }
 
   Uint8List toBytes() {
