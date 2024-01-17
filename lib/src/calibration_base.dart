@@ -65,6 +65,21 @@ class FixedStandard extends Standard {
   double get value => _value;
 }
 
+class DefaultStandard extends Standard {
+  final double _value;
+
+  DefaultStandard(this._value);
+
+  @override
+  String toString() => "DefaultStandard($_value)";
+
+  @override
+  bool get acceptable => true;
+
+  @override
+  double get value => _value;
+}
+
 class UnknownStandard extends Standard {
   @override
   String toString() => "Unknown()";
@@ -142,7 +157,7 @@ class CalibrationTemplate {
 
   static CalibrationTemplate waterPh() => CalibrationTemplate(
       curveType: CurveType.linear,
-      standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
+      standards: [DefaultStandard(4), DefaultStandard(7), DefaultStandard(10)]);
 
   static CalibrationTemplate waterDissolvedOxygen() => CalibrationTemplate(
       curveType: CurveType.linear,
