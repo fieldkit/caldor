@@ -65,6 +65,21 @@ class FixedStandard extends Standard {
   double get value => _value;
 }
 
+class DefaultStandard extends Standard {
+  final double _value;
+
+  DefaultStandard(this._value);
+
+  @override
+  String toString() => "DefaultStandard($_value)";
+
+  @override
+  bool get acceptable => true;
+
+  @override
+  double get value => _value;
+}
+
 class UnknownStandard extends Standard {
   @override
   String toString() => "Unknown()";
@@ -142,37 +157,25 @@ class CalibrationTemplate {
 
   CalibrationTemplate({required this.curveType, required this.standards});
 
-  // Factory methods to create predefined calibration templates for different sensor types.
   static CalibrationTemplate waterPh() => CalibrationTemplate(
       curveType: CurveType.linear,
-      standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
+      standards: [DefaultStandard(4), DefaultStandard(7), DefaultStandard(10)]);
 
-  static CalibrationTemplate waterDissolvedOxygen() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [
-        UnknownStandard(),
-        UnknownStandard(),
-        UnknownStandard()
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate waterDissolvedOxygen() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate waterEc() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [
-        UnknownStandard(),
-        UnknownStandard(),
-        UnknownStandard()
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate waterEc() => CalibrationTemplate(
+      curveType: CurveType.exponential,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate waterTemp() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [
-        UnknownStandard(),
-        UnknownStandard(),
-        UnknownStandard()
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate waterTemp() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate showCase() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [
-        UnknownStandard(),
-        FixedStandard(10)
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate showCase() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [UnknownStandard(), FixedStandard(10)]);
 
   static CalibrationTemplate? forModuleKey(String key) {
     switch (key) {
@@ -232,12 +235,11 @@ class CurrentCalibration {
 
   // Calculates and returns the coefficients for the current calibration curve.
   List<double> calculateCoefficients() {
-    if (curveType == CurveType.exponential) {
-      return exponentialCurve(_points);
-    } else if (curveType == CurveType.linear) {
-      return linearCurve(_points);
-    } else {
-      throw Exception("Unknown curve type: $curveType");
+    switch (curveType) {
+      case CurveType.linear:
+        return linearCurve(_points);
+      case CurveType.exponential:
+        return exponentialCurve(_points);
     }
   }
 
