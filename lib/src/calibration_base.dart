@@ -91,8 +91,10 @@ class UserStandard extends Standard {
   double get value => _value;
 }
 
+// Calculates the coefficients for an exponential calibration curve.
 List<double> exponentialCurve(List<CalibrationPoint> points) {
-  ParametrizedUnaryFunction<double> fn = ParametrizedUnaryFunction.list(DataType.float, 3, (params) {
+  ParametrizedUnaryFunction<double> fn =
+      ParametrizedUnaryFunction.list(DataType.float, 3, (params) {
     return (double t) {
       return params[0] + params[1] * exp(t * params[2]);
     };
@@ -114,6 +116,7 @@ List<double> exponentialCurve(List<CalibrationPoint> points) {
   return v.parameters;
 }
 
+// Calculates the coefficients for a linear calibration curve.
 List<double> linearCurve(List<CalibrationPoint> points) {
   final n = points.length;
   final x = points.map((p) => p.reading.uncalibrated).toList();
@@ -139,20 +142,37 @@ class CalibrationTemplate {
 
   CalibrationTemplate({required this.curveType, required this.standards});
 
-  static CalibrationTemplate waterPh() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
+  // Factory methods to create predefined calibration templates for different sensor types.
+  static CalibrationTemplate waterPh() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
 
   static CalibrationTemplate waterDissolvedOxygen() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
+      CalibrationTemplate(curveType: CurveType.linear, standards: [
+        UnknownStandard(),
+        UnknownStandard(),
+        UnknownStandard()
+      ]); // TODO @jlewallen, what should we put for these standards?
 
   static CalibrationTemplate waterEc() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
+      CalibrationTemplate(curveType: CurveType.exponential, standards: [
+        UnknownStandard(),
+        UnknownStandard(),
+        UnknownStandard()
+      ]); // TODO @jlewallen, what should we put for these standards?
 
   static CalibrationTemplate waterTemp() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
+      CalibrationTemplate(curveType: CurveType.exponential, standards: [
+        UnknownStandard(),
+        UnknownStandard(),
+        UnknownStandard()
+      ]); // TODO @jlewallen, what should we put for these standards?
 
   static CalibrationTemplate showCase() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [UnknownStandard(), FixedStandard(10)]);
+      CalibrationTemplate(curveType: CurveType.linear, standards: [
+        UnknownStandard(),
+        FixedStandard(10)
+      ]); // TODO @jlewallen, what should we put for these standards?
 
   static CalibrationTemplate? forModuleKey(String key) {
     switch (key) {
@@ -170,28 +190,35 @@ class CalibrationTemplate {
 }
 
 enum CalibrationKind {
+  // TODO: @jlewallen, what should be here?
   none,
 }
 
+// Represents the current state of a sensor calibration.
 class CurrentCalibration {
   final CurveType curveType;
   final CalibrationKind kind;
   final List<CalibrationPoint> _points = List.empty(growable: true);
 
-  CurrentCalibration({required this.curveType, this.kind = CalibrationKind.none});
+  CurrentCalibration(
+      {required this.curveType, this.kind = CalibrationKind.none});
 
   @override
   String toString() => _points.toString();
 
+  // Adds a new calibration point.
   void addPoint(CalibrationPoint point) {
     _points.add(point);
   }
 
+  // Converts current calibration data to protobuf format.
   proto.ModuleConfiguration toDataProtocol() {
     final time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final cps = _points
-        .map((p) =>
-            proto.CalibrationPoint(references: [p.standard.value!], uncalibrated: [p.reading.uncalibrated], factory: [p.reading.value]))
+        .map((p) => proto.CalibrationPoint(
+            references: [p.standard.value!],
+            uncalibrated: [p.reading.uncalibrated],
+            factory: [p.reading.value]))
         .toList();
     final coefficients = calculateCoefficients();
     final calibration = proto.Calibration(
@@ -203,10 +230,18 @@ class CurrentCalibration {
     return proto.ModuleConfiguration(calibrations: [calibration]);
   }
 
+  // Calculates and returns the coefficients for the current calibration curve.
   List<double> calculateCoefficients() {
-    return linearCurve(_points);
+    if (curveType == CurveType.exponential) {
+      return exponentialCurve(_points);
+    } else if (curveType == CurveType.linear) {
+      return linearCurve(_points);
+    } else {
+      throw Exception("Unknown curve type: $curveType");
+    }
   }
 
+  // Serializes the current calibration configuration to bytes.
   Uint8List toBytes() {
     final proto.ModuleConfiguration config = toDataProtocol();
     final buffer = config.writeToBuffer();
