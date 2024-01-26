@@ -251,3 +251,29 @@ class CurrentCalibration {
     return delimitted.toBuffer();
   }
 }
+
+CurrentCalibration createCalibration(
+    String moduleKey, List<CalibrationPoint> points) {
+  // Retrieve the calibration template for the given module type
+  CalibrationTemplate? template = CalibrationTemplate.forModuleKey(moduleKey);
+
+  if (template == null) {
+    throw Exception("Unknown module key: $moduleKey");
+  }
+
+  if (template.standards.length > points.length) {
+    throw Exception(
+        "Not enough calibration points provided. Expected ${template.standards.length}, got ${points.length}");
+  }
+
+  // Create a CurrentCalibration instance based on the curve type
+  CurrentCalibration currentCalibration =
+      CurrentCalibration(curveType: template.curveType);
+
+  // Add the provided points to the CurrentCalibration
+  for (var point in points) {
+    currentCalibration.addPoint(point);
+  }
+
+  return currentCalibration;
+}
