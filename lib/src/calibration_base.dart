@@ -106,6 +106,7 @@ class UserStandard extends Standard {
   double get value => _value;
 }
 
+// Calculates the coefficients for an exponential calibration curve.
 List<double> exponentialCurve(List<CalibrationPoint> points) {
   ParametrizedUnaryFunction<double> fn =
       ParametrizedUnaryFunction.list(DataType.float, 3, (params) {
@@ -130,6 +131,7 @@ List<double> exponentialCurve(List<CalibrationPoint> points) {
   return v.parameters;
 }
 
+// Calculates the coefficients for a linear calibration curve.
 List<double> linearCurve(List<CalibrationPoint> points) {
   final n = points.length;
   final x = points.map((p) => p.reading.uncalibrated).toList();
@@ -191,9 +193,11 @@ class CalibrationTemplate {
 }
 
 enum CalibrationKind {
+  // TODO: @jlewallen, what should be here?
   none,
 }
 
+// Represents the current state of a sensor calibration.
 class CurrentCalibration {
   final CurveType curveType;
   final CalibrationKind kind;
@@ -205,10 +209,12 @@ class CurrentCalibration {
   @override
   String toString() => _points.toString();
 
+  // Adds a new calibration point.
   void addPoint(CalibrationPoint point) {
     _points.add(point);
   }
 
+  // Converts current calibration data to protobuf format.
   proto.ModuleConfiguration toDataProtocol() {
     final time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final cps = _points
@@ -227,6 +233,7 @@ class CurrentCalibration {
     return proto.ModuleConfiguration(calibrations: [calibration]);
   }
 
+  // Calculates and returns the coefficients for the current calibration curve.
   List<double> calculateCoefficients() {
     switch (curveType) {
       case CurveType.linear:
@@ -236,6 +243,7 @@ class CurrentCalibration {
     }
   }
 
+  // Serializes the current calibration configuration to bytes.
   Uint8List toBytes() {
     final proto.ModuleConfiguration config = toDataProtocol();
     final buffer = config.writeToBuffer();
@@ -244,4 +252,30 @@ class CurrentCalibration {
     delimitted.writeRawBytes(buffer);
     return delimitted.toBuffer();
   }
+}
+
+CurrentCalibration createCalibration(
+    String moduleKey, List<CalibrationPoint> points) {
+  // Retrieve the calibration template for the given module type
+  CalibrationTemplate? template = CalibrationTemplate.forModuleKey(moduleKey);
+
+  if (template == null) {
+    throw Exception("Unknown module key: $moduleKey");
+  }
+
+  if (template.standards.length > points.length) {
+    throw Exception(
+        "Not enough calibration points provided. Expected ${template.standards.length}, got ${points.length}");
+  }
+
+  // Create a CurrentCalibration instance based on the curve type
+  CurrentCalibration currentCalibration =
+      CurrentCalibration(curveType: template.curveType);
+
+  // Add the provided points to the CurrentCalibration
+  for (var point in points) {
+    currentCalibration.addPoint(point);
+  }
+
+  return currentCalibration;
 }
