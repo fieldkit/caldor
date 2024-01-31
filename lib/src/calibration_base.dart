@@ -147,32 +147,21 @@ class CalibrationTemplate {
       curveType: CurveType.linear,
       standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
 
-  static CalibrationTemplate waterDissolvedOxygen() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [
-        UnknownStandard(),
-        UnknownStandard(),
-        UnknownStandard()
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate waterDissolvedOxygen() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate waterEc() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [
-        UnknownStandard(),
-        UnknownStandard(),
-        UnknownStandard()
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate waterEc() => CalibrationTemplate(
+      curveType: CurveType.exponential,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate waterTemp() =>
-      CalibrationTemplate(curveType: CurveType.exponential, standards: [
-        UnknownStandard(),
-        UnknownStandard(),
-        UnknownStandard()
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate waterTemp() => CalibrationTemplate(
+      curveType: CurveType.exponential,
+      standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
-  static CalibrationTemplate showCase() =>
-      CalibrationTemplate(curveType: CurveType.linear, standards: [
-        UnknownStandard(),
-        FixedStandard(10)
-      ]); // TODO @jlewallen, what should we put for these standards?
+  static CalibrationTemplate showCase() => CalibrationTemplate(
+      curveType: CurveType.linear,
+      standards: [UnknownStandard(), FixedStandard(10)]);
 
   static CalibrationTemplate? forModuleKey(String key) {
     switch (key) {
@@ -232,6 +221,14 @@ class CurrentCalibration {
 
   // Calculates and returns the coefficients for the current calibration curve.
   List<double> calculateCoefficients() {
+    if (_points.isEmpty) {
+      throw Exception("No calibration points available");
+    }
+
+    if (_points.length == 1) {
+      throw Exception("Not enough calibration points available");
+    }
+
     if (curveType == CurveType.exponential) {
       return exponentialCurve(_points);
     } else if (curveType == CurveType.linear) {
