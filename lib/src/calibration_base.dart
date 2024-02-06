@@ -65,6 +65,21 @@ class FixedStandard extends Standard {
   double get value => _value;
 }
 
+class DefaultStandard extends Standard {
+  final double _value;
+
+  DefaultStandard(this._value);
+
+  @override
+  String toString() => "DefaultStandard($_value)";
+
+  @override
+  bool get acceptable => true;
+
+  @override
+  double get value => _value;
+}
+
 class UnknownStandard extends Standard {
   @override
   String toString() => "Unknown()";
@@ -181,10 +196,9 @@ class CalibrationTemplate {
 
   CalibrationTemplate({required this.curveType, required this.standards});
 
-  // Factory methods to create predefined calibration templates for different sensor types.
   static CalibrationTemplate waterPh() => CalibrationTemplate(
       curveType: CurveType.linear,
-      standards: [FixedStandard(4), FixedStandard(7), FixedStandard(10)]);
+      standards: [DefaultStandard(4), DefaultStandard(7), DefaultStandard(10)]);
 
   static CalibrationTemplate waterDissolvedOxygen() => CalibrationTemplate(
       curveType: CurveType.linear,
@@ -195,7 +209,11 @@ class CalibrationTemplate {
       standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
   static CalibrationTemplate waterTemp() => CalibrationTemplate(
+<<<<<<< HEAD
       curveType: CurveType.exponential,
+=======
+      curveType: CurveType.linear,
+>>>>>>> 2568c514f4b3553843ee8490bf32c73bea34b842
       standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
   static CalibrationTemplate showCase() => CalibrationTemplate(
@@ -260,6 +278,7 @@ class CurrentCalibration {
 
   // Calculates and returns the coefficients for the current calibration curve.
   List<double> calculateCoefficients() {
+<<<<<<< HEAD
     if (_points.isEmpty) {
       throw Exception("No calibration points available");
     }
@@ -274,6 +293,13 @@ class CurrentCalibration {
       return linearCurve(_points);
     } else {
       throw Exception("Unknown curve type: $curveType");
+=======
+    switch (curveType) {
+      case CurveType.linear:
+        return linearCurve(_points);
+      case CurveType.exponential:
+        return exponentialCurve(_points);
+>>>>>>> 2568c514f4b3553843ee8490bf32c73bea34b842
     }
   }
 

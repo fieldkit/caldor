@@ -13,6 +13,7 @@ dependencies:
   fk_data_protocol:
     git:
       url: https://gitlab.com/fieldkit/libraries/data-protocol.git
+      ref: 13d5785bdcc53ea74a2215f5149d6d576c5ac1c4
       path: dart
 
 dev_dependencies:
