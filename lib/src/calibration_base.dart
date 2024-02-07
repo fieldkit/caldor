@@ -209,11 +209,7 @@ class CalibrationTemplate {
       standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
   static CalibrationTemplate waterTemp() => CalibrationTemplate(
-<<<<<<< HEAD
-      curveType: CurveType.exponential,
-=======
       curveType: CurveType.linear,
->>>>>>> 2568c514f4b3553843ee8490bf32c73bea34b842
       standards: [UnknownStandard(), UnknownStandard(), UnknownStandard()]);
 
   static CalibrationTemplate showCase() => CalibrationTemplate(
@@ -278,7 +274,6 @@ class CurrentCalibration {
 
   // Calculates and returns the coefficients for the current calibration curve.
   List<double> calculateCoefficients() {
-<<<<<<< HEAD
     if (_points.isEmpty) {
       throw Exception("No calibration points available");
     }
@@ -286,20 +281,11 @@ class CurrentCalibration {
     if (_points.length == 1) {
       throw Exception("Not enough calibration points available");
     }
-
-    if (curveType == CurveType.exponential) {
-      return exponentialCurve(_points);
-    } else if (curveType == CurveType.linear) {
-      return linearCurve(_points);
-    } else {
-      throw Exception("Unknown curve type: $curveType");
-=======
     switch (curveType) {
       case CurveType.linear:
         return linearCurve(_points);
       case CurveType.exponential:
         return exponentialCurve(_points);
->>>>>>> 2568c514f4b3553843ee8490bf32c73bea34b842
     }
   }
 
