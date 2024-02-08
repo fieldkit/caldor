@@ -186,7 +186,7 @@ double calibrateValue(proto.CurveType curveType, double value,
     case proto.CurveType.CURVE_EXPONENTIAL:
       return _applyExponentialValue(value, calibration);
     default:
-      return 0.0;
+      throw Exception("Unknown curve type: $curveType");
   }
 }
 
