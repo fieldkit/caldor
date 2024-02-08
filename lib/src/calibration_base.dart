@@ -151,6 +151,45 @@ List<double> linearCurve(List<CalibrationPoint> points) {
   return [b, m];
 }
 
+double _applyLinearValue(
+    double value, List<proto.CalibrationPoint> calibration) {
+  if (calibration.length < 2) {
+    // Handle error: not enough calibration data
+    return 0.0;
+  }
+
+  double a = calibration[0].uncalibrated[0];
+  double b = calibration[1].uncalibrated[0];
+
+  return a + b * value; // Apply linear calibration
+}
+
+double _applyExponentialValue(
+    double value, List<proto.CalibrationPoint> calibration) {
+  if (calibration.length < 3) {
+    // Handle error: not enough calibration data
+    return 0.0;
+  }
+
+  double a = calibration[0].uncalibrated[0];
+  double b = calibration[1].uncalibrated[0];
+  double c = calibration[2].uncalibrated[0];
+
+  return a * exp(b * value) + c; // Apply exponential calibration
+}
+
+double calibrateValue(proto.CurveType curveType, double value,
+    List<proto.CalibrationPoint> calibration) {
+  switch (curveType) {
+    case proto.CurveType.CURVE_LINEAR:
+      return _applyLinearValue(value, calibration);
+    case proto.CurveType.CURVE_EXPONENTIAL:
+      return _applyExponentialValue(value, calibration);
+    default:
+      throw Exception("Unknown curve type: $curveType");
+  }
+}
+
 class CalibrationTemplate {
   final CurveType curveType;
   final List<Standard> standards;
@@ -235,6 +274,13 @@ class CurrentCalibration {
 
   // Calculates and returns the coefficients for the current calibration curve.
   List<double> calculateCoefficients() {
+    if (_points.isEmpty) {
+      throw Exception("No calibration points available");
+    }
+
+    if (_points.length == 1) {
+      throw Exception("Not enough calibration points available");
+    }
     switch (curveType) {
       case CurveType.linear:
         return linearCurve(_points);
